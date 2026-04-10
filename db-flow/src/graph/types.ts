@@ -3,6 +3,9 @@ import type { Node, Edge } from "reactflow";
 /* ---------- Graph mode ---------- */
 export type GraphMode = "pipeline" | "erd";
 
+/* ---------- Column constraints ---------- */
+export type ColumnConstraint = "NOT NULL" | "UNIQUE" | "DEFAULT" | "INDEX";
+
 /* ---------- Base ---------- */
 export type BaseNodeData = {
     label: string;
@@ -23,6 +26,9 @@ export type Column = {
     type: string;
     isPK?: boolean;
     isFK?: boolean;
+    isNullable?: boolean;
+    isUnique?: boolean;
+    defaultValue?: string;
 };
 
 export type ERDNodeData = BaseNodeData & {
