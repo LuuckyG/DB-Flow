@@ -74,6 +74,10 @@ body {
 
 .app-canvas {
   flex: 1;
+  /* height: 0 forces the flex child to actually shrink to the remaining
+     space instead of overflowing, which is required for ReactFlow to
+     correctly measure its container height.               */
+  height: 0;
   position: relative;
   overflow: hidden;
 }
