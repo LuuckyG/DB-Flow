@@ -291,3 +291,247 @@ body {
 .edge-path--one-to-one   { stroke: #3b82f6; stroke-width: 1.5; }
 .edge-path--one-to-many  { stroke: #22c55e; stroke-width: 1.5; }
 .edge-path--many-to-many { stroke: #a855f7; stroke-width: 1.5; }
+
+/* ─── TableEditor (slide-in sidebar) ───────────────────────────────── */
+.te-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 320px;
+  background: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.te-panel--hidden {
+  transform: translateX(100%);
+}
+
+/* Header */
+.te-header {
+  background: #1e293b;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.te-header__title {
+  color: #f1f5f9;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.te-header__title span:last-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.te-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.te-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 14px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.1s, background 0.1s;
+}
+
+.te-icon-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.te-icon-btn--danger:hover {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Body */
+.te-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.te-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.te-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1e293b;
+  outline: none;
+  background: #f8fafc;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.te-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px #e0e7ff;
+  background: #ffffff;
+}
+
+.te-divider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 0;
+}
+
+/* Column list header */
+.te-col-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Column row card */
+.te-col-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.te-col-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 12px;
+}
+
+.te-col-card__name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.te-col-card__name--pk { color: #d97706; }
+.te-col-card__name--fk { color: #4f46e5; }
+.te-col-card__name--default { color: #374151; }
+
+.te-col-card__btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 13px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.1s;
+}
+
+.te-col-card__btn:hover { color: #475569; }
+.te-col-card__btn--delete:hover { color: #ef4444; }
+.te-col-card__btn:disabled { opacity: 0.3; cursor: default; }
+
+.te-col-card__body {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.te-col-card__inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.te-col-card__inputs .te-input {
+  flex: 1;
+}
+
+/* Constraint checkboxes */
+.te-constraints {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.te-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+}
+
+.te-checkbox-label input[type="checkbox"] {
+  accent-color: #6366f1;
+}
+
+/* Add column button */
+.te-add-col-btn {
+  width: 100%;
+  padding: 8px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 6px;
+  background: none;
+  color: #64748b;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 500;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.te-add-col-btn:hover {
+  border-color: #6366f1;
+  color: #4f46e5;
+}
+
+/* Footer stats */
+.te-stats {
+  font-size: 11px;
+  color: #94a3b8;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 8px;
+  display: flex;
+  gap: 12px;
+}

@@ -16,6 +16,7 @@ type GraphState = {
 
     setMode: (mode: GraphMode) => void;
     addNode: (node: AppNode) => void;
+    removeNode: (nodeId: string) => void;
     setGraph: (nodes: AppNode[], edges: AppEdge[]) => void;
     setSelectedNode: (id: string | null) => void;
     updateNodeData: (nodeId: string, data: Partial<ERDNodeData>) => void;
@@ -37,6 +38,17 @@ export const useGraphStore = create<GraphState>((set, get) => ({
 
     /* ---------- Add a single node ---------- */
     addNode: (node) => set({ nodes: [...get().nodes, node] }),
+
+    /* ---------- Remove a node (and its connected edges) ---------- */
+    removeNode: (nodeId) =>
+        set({
+            nodes: get().nodes.filter((n) => n.id !== nodeId),
+            edges: get().edges.filter(
+                (e) => e.source !== nodeId && e.target !== nodeId
+            ),
+            selectedNodeId:
+                get().selectedNodeId === nodeId ? null : get().selectedNodeId,
+        }),
 
     /* ---------- Replace entire graph ---------- */
     setGraph: (nodes, edges) => set({ nodes, edges }),

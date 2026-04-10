@@ -1,5 +1,4 @@
-// src/components/TableEditor.tsx
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useGraphStore } from "../store/graphStore";
 import type { Column, ERDNodeData } from "../graph/types";
 
@@ -15,155 +14,13 @@ const SQL_TYPES = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Styles                                                              */
-/* ------------------------------------------------------------------ */
-const s: Record<string, React.CSSProperties> = {
-    overlay: {
-        position: "absolute",
-        top: 0,
-        right: 0,
-        height: "100%",
-        width: 320,
-        background: "#ffffff",
-        borderLeft: "1px solid #e2e8f0",
-        boxShadow: "-4px 0 24px rgba(0,0,0,0.08)",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 20,
-        transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)",
-        fontFamily: "inherit",
-    },
-    overlayHidden: {
-        transform: "translateX(100%)",
-    },
-    header: {
-        background: "#1e293b",
-        padding: "12px 16px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-    headerTitle: {
-        color: "#f1f5f9",
-        fontWeight: 700,
-        fontSize: 14,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-    },
-    closeBtn: {
-        background: "none",
-        border: "none",
-        color: "#94a3b8",
-        cursor: "pointer",
-        fontSize: 18,
-        lineHeight: 1,
-        padding: "2px 6px",
-        borderRadius: 4,
-    },
-    body: {
-        flex: 1,
-        overflowY: "auto",
-        padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-    },
-    label: {
-        display: "block",
-        fontSize: 11,
-        fontWeight: 600,
-        color: "#64748b",
-        textTransform: "uppercase" as const,
-        letterSpacing: "0.06em",
-        marginBottom: 4,
-    },
-    input: {
-        width: "100%",
-        padding: "7px 10px",
-        border: "1px solid #e2e8f0",
-        borderRadius: 6,
-        fontSize: 13,
-        color: "#1e293b",
-        outline: "none",
-        background: "#f8fafc",
-        boxSizing: "border-box" as const,
-        transition: "border-color 0.15s",
-    },
-    divider: {
-        borderTop: "1px solid #e2e8f0",
-        margin: "4px 0",
-    },
-    colRow: {
-        border: "1px solid #e2e8f0",
-        borderRadius: 8,
-        background: "#f8fafc",
-        overflow: "hidden",
-    },
-    colHeader: {
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        padding: "6px 10px",
-        background: "#f1f5f9",
-        borderBottom: "1px solid #e2e8f0",
-        fontSize: 12,
-    },
-    colBody: {
-        padding: "8px 10px",
-        display: "flex",
-        flexDirection: "column" as const,
-        gap: 8,
-    },
-    colInputRow: {
-        display: "flex",
-        gap: 8,
-    },
-    checkboxGroup: {
-        display: "flex",
-        gap: 12,
-        flexWrap: "wrap" as const,
-    },
-    checkboxLabel: {
-        display: "flex",
-        alignItems: "center",
-        gap: 4,
-        fontSize: 12,
-        color: "#374151",
-        cursor: "pointer",
-        userSelect: "none" as const,
-    },
-    iconBtn: {
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: "#94a3b8",
-        fontSize: 14,
-        padding: "2px 5px",
-        borderRadius: 4,
-        lineHeight: 1,
-    },
-    addBtn: {
-        width: "100%",
-        padding: "8px",
-        border: "1.5px dashed #cbd5e1",
-        borderRadius: 6,
-        background: "none",
-        color: "#64748b",
-        fontSize: 13,
-        cursor: "pointer",
-        fontWeight: 500,
-        transition: "border-color 0.15s, color 0.15s",
-    },
-};
-
-/* ------------------------------------------------------------------ */
 /*  ColumnRow — one editable column entry                               */
 /* ------------------------------------------------------------------ */
 function ColumnRow({
     col,
     index,
     total,
+    nodeId,
     onChange,
     onDelete,
     onMove,
@@ -171,31 +28,28 @@ function ColumnRow({
     col: Column;
     index: number;
     total: number;
+    nodeId: string;
     onChange: (updated: Column) => void;
     onDelete: () => void;
     onMove: (dir: -1 | 1) => void;
 }) {
-    const pkColor = col.isPK ? "#f59e0b" : undefined;
-    const fkColor = col.isFK ? "#6366f1" : undefined;
+    const nameClass = col.isPK
+        ? "te-col-card__name te-col-card__name--pk"
+        : col.isFK
+          ? "te-col-card__name te-col-card__name--fk"
+          : "te-col-card__name te-col-card__name--default";
 
     return (
-        <div style={s.colRow}>
-            {/* Mini header with drag order controls */}
-            <div style={s.colHeader}>
-                <span
-                    style={{
-                        flex: 1,
-                        fontWeight: 600,
-                        color: pkColor ?? fkColor ?? "#374151",
-                        fontSize: 12,
-                    }}
-                >
-                    {col.isPK && "🔑 "}{col.isFK && "🔗 "}{col.name || "kolom"}
+        <div className="te-col-card">
+            {/* Mini header with order controls */}
+            <div className="te-col-card__header">
+                <span className={nameClass}>
+                    {col.isPK && "🔑 "}{col.isFK && "🔗 "}
+                    {col.name || "kolom"}
                 </span>
 
-                {/* Order controls */}
                 <button
-                    style={{ ...s.iconBtn, opacity: index === 0 ? 0.3 : 1 }}
+                    className="te-col-card__btn"
                     onClick={() => onMove(-1)}
                     disabled={index === 0}
                     title="Omhoog"
@@ -203,7 +57,7 @@ function ColumnRow({
                     ▲
                 </button>
                 <button
-                    style={{ ...s.iconBtn, opacity: index === total - 1 ? 0.3 : 1 }}
+                    className="te-col-card__btn"
                     onClick={() => onMove(1)}
                     disabled={index === total - 1}
                     title="Omlaag"
@@ -211,7 +65,7 @@ function ColumnRow({
                     ▼
                 </button>
                 <button
-                    style={{ ...s.iconBtn, color: "#ef4444" }}
+                    className="te-col-card__btn te-col-card__btn--delete"
                     onClick={onDelete}
                     title="Kolom verwijderen"
                 >
@@ -220,28 +74,25 @@ function ColumnRow({
             </div>
 
             {/* Inputs */}
-            <div style={s.colBody}>
-                <div style={s.colInputRow}>
-                    {/* Name */}
+            <div className="te-col-card__body">
+                <div className="te-col-card__inputs">
                     <input
-                        style={{ ...s.input, flex: 1 }}
+                        className="te-input"
                         placeholder="kolomnaam"
                         value={col.name}
                         onChange={(e) => onChange({ ...col, name: e.target.value })}
                         spellCheck={false}
                     />
-
-                    {/* Type with datalist */}
                     <div style={{ flex: 1, position: "relative" }}>
                         <input
-                            style={s.input}
+                            className="te-input"
                             placeholder="type"
                             value={col.type}
-                            list={`types-${index}`}
+                            list={`types-${nodeId}-${index}`}
                             onChange={(e) => onChange({ ...col, type: e.target.value })}
                             spellCheck={false}
                         />
-                        <datalist id={`types-${index}`}>
+                        <datalist id={`types-${nodeId}-${index}`}>
                             {SQL_TYPES.map((t) => (
                                 <option key={t} value={t} />
                             ))}
@@ -249,8 +100,7 @@ function ColumnRow({
                     </div>
                 </div>
 
-                {/* Constraints */}
-                <div style={s.checkboxGroup}>
+                <div className="te-constraints">
                     {(
                         [
                             { key: "isPK", label: "PK", title: "Primary Key" },
@@ -259,14 +109,13 @@ function ColumnRow({
                             { key: "isUnique", label: "Unique", title: "Unique" },
                         ] as const
                     ).map(({ key, label, title }) => (
-                        <label key={key} style={s.checkboxLabel} title={title}>
+                        <label key={key} className="te-checkbox-label" title={title}>
                             <input
                                 type="checkbox"
                                 checked={!!col[key as keyof Column]}
                                 onChange={(e) =>
                                     onChange({ ...col, [key]: e.target.checked })
                                 }
-                                style={{ accentColor: "#6366f1" }}
                             />
                             {label}
                         </label>
@@ -281,26 +130,26 @@ function ColumnRow({
 /*  TableEditor — the slide-in panel                                    */
 /* ------------------------------------------------------------------ */
 export default function TableEditor() {
-    const { nodes, selectedNodeId, updateNodeData, reorderColumn, setSelectedNode } =
-        useGraphStore();
+    const {
+        nodes,
+        selectedNodeId,
+        updateNodeData,
+        reorderColumn,
+        removeNode,
+        setSelectedNode,
+    } = useGraphStore();
 
     const selectedNode = nodes.find((n) => n.id === selectedNodeId);
     const nodeData = selectedNode?.data as ERDNodeData | undefined;
     const isOpen = !!selectedNode && !!nodeData?.columns;
 
-    // Local state: tableName + columns (uncommitted while editing)
-    const [tableName, setTableName] = useState("");
-    const [columns, setColumns] = useState<Column[]>([]);
+    // Initialise from store. The component is re-keyed on selectedNodeId in
+    // App.tsx so it remounts fresh every time a different table is selected —
+    // no useEffect sync needed.
+    const [tableName, setTableName] = useState(nodeData?.tableName ?? "");
+    const [columns, setColumns] = useState<Column[]>(nodeData?.columns ?? []);
 
-    // Sync from store when selected node changes
-    useEffect(() => {
-        if (nodeData) {
-            setTableName(nodeData.tableName);
-            setColumns(nodeData.columns);
-        }
-    }, [selectedNodeId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Persist changes to the store on every edit
+    // Persist changes to store on every edit
     const persist = (name: string, cols: Column[]) => {
         if (!selectedNodeId) return;
         updateNodeData(selectedNodeId, { tableName: name, label: name, columns: cols });
@@ -328,7 +177,6 @@ export default function TableEditor() {
         const to = index + dir;
         if (to < 0 || to >= columns.length) return;
         reorderColumn(selectedNodeId, index, to);
-        // also update local state so UI stays in sync immediately
         const next = [...columns];
         const [moved] = next.splice(index, 1);
         next.splice(to, 0, moved);
@@ -344,32 +192,46 @@ export default function TableEditor() {
         persist(tableName, next);
     };
 
+    const handleDeleteTable = () => {
+        if (!selectedNodeId) return;
+        if (!confirm(`Tabel "${tableName}" verwijderen?`)) return;
+        removeNode(selectedNodeId);
+    };
+
     return (
-        <div
-            style={{
-                ...s.overlay,
-                ...(isOpen ? {} : s.overlayHidden),
-            }}
-        >
+        <div className={`te-panel${isOpen ? "" : " te-panel--hidden"}`}>
             {/* Header */}
-            <div style={s.header}>
-                <div style={s.headerTitle}>
-                    <span>🗄️</span>
+            <div className="te-header">
+                <div className="te-header__title">
+                    <span>▤</span>
                     <span>{tableName || "Tabel bewerken"}</span>
                 </div>
-                <button style={s.closeBtn} onClick={() => setSelectedNode(null)} title="Sluiten">
-                    ✕
-                </button>
+                <div className="te-header__actions">
+                    <button
+                        className="te-icon-btn te-icon-btn--danger"
+                        onClick={handleDeleteTable}
+                        title="Tabel verwijderen"
+                    >
+                        🗑
+                    </button>
+                    <button
+                        className="te-icon-btn"
+                        onClick={() => setSelectedNode(null)}
+                        title="Sluiten"
+                    >
+                        ✕
+                    </button>
+                </div>
             </div>
 
-            {/* Body */}
+            {/* Body — only rendered when a table is selected */}
             {isOpen && (
-                <div style={s.body}>
+                <div className="te-body">
                     {/* Table name */}
                     <div>
-                        <label style={s.label}>Tabelnaam</label>
+                        <label className="te-field-label">Tabelnaam</label>
                         <input
-                            style={s.input}
+                            className="te-input"
                             value={tableName}
                             onChange={(e) => handleNameChange(e.target.value)}
                             placeholder="table_name"
@@ -377,22 +239,16 @@ export default function TableEditor() {
                         />
                     </div>
 
-                    <div style={s.divider} />
+                    <hr className="te-divider" />
 
-                    {/* Column header */}
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                        }}
-                    >
-                        <label style={{ ...s.label, margin: 0 }}>
+                    {/* Columns heading */}
+                    <div className="te-col-list-header">
+                        <label className="te-field-label" style={{ margin: 0 }}>
                             Kolommen ({columns.length})
                         </label>
                     </div>
 
-                    {/* Columns */}
+                    {/* Column cards */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         {columns.map((col, i) => (
                             <ColumnRow
@@ -400,6 +256,7 @@ export default function TableEditor() {
                                 col={col}
                                 index={i}
                                 total={columns.length}
+                                nodeId={selectedNodeId!}
                                 onChange={(updated) => handleColumnChange(i, updated)}
                                 onDelete={() => handleColumnDelete(i)}
                                 onMove={(dir) => handleColumnMove(i, dir)}
@@ -408,21 +265,12 @@ export default function TableEditor() {
                     </div>
 
                     {/* Add column */}
-                    <button style={s.addBtn} onClick={handleAddColumn}>
+                    <button className="te-add-col-btn" onClick={handleAddColumn}>
                         ＋ Kolom toevoegen
                     </button>
 
                     {/* Footer stats */}
-                    <div
-                        style={{
-                            fontSize: 11,
-                            color: "#94a3b8",
-                            borderTop: "1px solid #f1f5f9",
-                            paddingTop: 8,
-                            display: "flex",
-                            gap: 12,
-                        }}
-                    >
+                    <div className="te-stats">
                         <span>PK: {columns.filter((c) => c.isPK).length}</span>
                         <span>FK: {columns.filter((c) => c.isFK).length}</span>
                         <span>Nullable: {columns.filter((c) => c.isNullable).length}</span>

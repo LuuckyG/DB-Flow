@@ -9,6 +9,7 @@ import { useGraphStore } from "../store/graphStore";
 import TableNode from "../erd/nodes/TableNode";
 import RelationEdge from "../erd/edges/RelationEdge";
 import Toolbar from "../components/Toolbar";
+import TableEditor from "../components/TableEditor";
 
 // Keep these as stable module-level references so ReactFlow
 // never re-mounts nodes/edges on every render.
@@ -25,7 +26,7 @@ const edgeTypes = {
  * both Toolbar (useReactFlow) and the canvas share the same RF context.
  */
 function AppLayout() {
-    const { nodes, edges, onNodesChange, onEdgesChange, setSelectedNode } =
+    const { nodes, edges, onNodesChange, onEdgesChange, setSelectedNode, selectedNodeId } =
         useGraphStore();
 
     return (
@@ -36,7 +37,7 @@ function AppLayout() {
                 <Toolbar />
             </header>
 
-            {/* Canvas */}
+            {/* Canvas + slide-in editor */}
             <main className="app-canvas">
                 <ReactFlow
                     nodes={nodes}
@@ -44,6 +45,7 @@ function AppLayout() {
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onNodeClick={(_e, node) => setSelectedNode(node.id)}
+                    onNodeDoubleClick={(_e, node) => setSelectedNode(node.id)}
                     onPaneClick={() => setSelectedNode(null)}
                     nodeTypes={nodeTypes}
                     edgeTypes={edgeTypes}
@@ -53,6 +55,11 @@ function AppLayout() {
                     <Background color="#cbd5e1" gap={20} />
                     <Controls />
                 </ReactFlow>
+
+                {/* TableEditor slides in over the right side of the canvas.
+                    Re-keyed on selectedNodeId so it remounts with fresh local
+                    state when the user selects a different table.            */}
+                <TableEditor key={selectedNodeId ?? "__none__"} />
             </main>
         </div>
     );
