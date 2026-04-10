@@ -1,77 +1,50 @@
 import { nanoid } from "nanoid";
+import { useReactFlow } from "reactflow";
 import { useGraphStore } from "../store/graphStore";
+import { layoutGraph } from "../graph/layout";
 import type { AppNode } from "../graph/types";
 
 export default function Toolbar() {
-    const { mode, addNode, nodes } = useGraphStore();
+    const { addNode, nodes, edges, setGraph } = useGraphStore();
+    const { fitView } = useReactFlow();
 
-    const yOffset = nodes.length * 80;
-
-    const addPipelineNode = (stepType: "source" | "transform" | "sink") => {
-        const node: AppNode = {
-            id: nanoid(),
-            type: "pipeline",
-            position: { x: 100, y: yOffset },
-            data: {
-                label: stepType.toUpperCase(),
-                stepType,
-                config: {},
-            },
-        };
-
-        addNode(node);
-    };
-
-    const addTableNode = () => {
+    /** Add a new empty table at a sensible position */
+    const handleAddTable = () => {
+        const offset = nodes.length * 40;
         const node: AppNode = {
             id: nanoid(),
             type: "table",
-            position: { x: 100, y: yOffset },
+            position: { x: 120 + offset, y: 80 + offset },
             data: {
-                label: "Table",
+                label: "new_table",
                 tableName: "new_table",
                 columns: [
                     { name: "id", type: "uuid", isPK: true },
                 ],
             },
         };
-
         addNode(node);
     };
 
+    /** Run dagre auto-layout and fit the view */
+    const handleAutoLayout = () => {
+        const laid = layoutGraph(nodes, edges, "erd");
+        setGraph(laid, edges);
+        // Give React Flow one tick to reposition nodes before fitting
+        setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 30);
+    };
+
     return (
-        <div
-            style={{
-                position: "absolute",
-                top: 10,
-                left: 10,
-                background: "#fff",
-                border: "1px solid #ddd",
-                padding: 8,
-                borderRadius: 6,
-                zIndex: 10,
-                width: 160,
-            }}
-        >
-            <strong>{mode.toUpperCase()}</strong>
+        <>
+            <button className="tb-btn tb-btn--primary" onClick={handleAddTable}>
+                + Add Table
+            </button>
 
-            {mode === "pipeline" && (
-                <>
-                    <button onClick={() => addPipelineNode("source")}>
-                        + Source
-                    </button>
-                    <button onClick={() => addPipelineNode("transform")}>
-                        + Transform
-                    </button>
-                    <button onClick={() => addPipelineNode("sink")}>
-                        + Sink
-                    </button>
-                </>
-            )}
+            <div className="tb-divider" />
 
-            {mode === "erd" && (
-                <button onClick={addTableNode}>+ Table</button>
-            )}
-        </div>
+            <button className="tb-btn" onClick={handleAutoLayout}>
+                ⊞ Auto-layout
+            </button>
+        </>
     );
 }

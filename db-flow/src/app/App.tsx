@@ -1,51 +1,67 @@
-import ReactFlow, { Background, Controls } from "reactflow";
+import ReactFlow, {
+    Background,
+    Controls,
+    ReactFlowProvider,
+} from "reactflow";
 import "reactflow/dist/style.css";
 
 import { useGraphStore } from "../store/graphStore";
-import PipelineNode from "../pipeline/nodes/PipelineNode";
-import Toolbar from "../components/Toolbar";
 import TableNode from "../erd/nodes/TableNode";
 import RelationEdge from "../erd/edges/RelationEdge";
+import Toolbar from "../components/Toolbar";
 
+// Keep these as stable module-level references so ReactFlow
+// never re-mounts nodes/edges on every render.
 const nodeTypes = {
-  pipeline: PipelineNode,
-  table: TableNode,
+    table: TableNode,
 };
 
 const edgeTypes = {
-  relation: RelationEdge,
+    relation: RelationEdge,
 };
 
+/**
+ * Inner layout — must live *inside* a single ReactFlowProvider so that
+ * both Toolbar (useReactFlow) and the canvas share the same RF context.
+ */
+function AppLayout() {
+    const { nodes, edges, onNodesChange, onEdgesChange, setSelectedNode } =
+        useGraphStore();
+
+    return (
+        <div className="app-root">
+            {/* Fixed top bar */}
+            <header className="app-topbar">
+                <span className="app-topbar__logo">⬡ DB Flow</span>
+                <Toolbar />
+            </header>
+
+            {/* Canvas */}
+            <main className="app-canvas">
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    onNodeClick={(_e, node) => setSelectedNode(node.id)}
+                    onPaneClick={() => setSelectedNode(null)}
+                    nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    fitView
+                    fitViewOptions={{ padding: 0.2 }}
+                >
+                    <Background color="#cbd5e1" gap={20} />
+                    <Controls />
+                </ReactFlow>
+            </main>
+        </div>
+    );
+}
+
 export default function App() {
-  const {
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    mode,
-    setMode,
-  } = useGraphStore();
-
-  return (
-    <div style={{ height: "100vh" }}>
-      <Toolbar />
-
-      <button onClick={() => setMode(mode === "pipeline" ? "erd" : "pipeline")}>
-        Switch mode
-      </button>
-
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        fitView
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
-    </div>
-  );
+    return (
+        <ReactFlowProvider>
+            <AppLayout />
+        </ReactFlowProvider>
+    );
 }

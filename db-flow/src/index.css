@@ -15,7 +15,7 @@ body {
   overflow: hidden;
 }
 
-/* React Flow overrides */
+/* ─── React Flow overrides ──────────────────────────────────────────── */
 .react-flow__node {
   border-radius: 8px;
   padding: 0;
@@ -41,3 +41,249 @@ body {
   border-radius: 8px;
   overflow: hidden;
 }
+
+/* ─── App shell ─────────────────────────────────────────────────────── */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.app-topbar {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06);
+  flex-shrink: 0;
+}
+
+.app-topbar__logo {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+  margin-right: 8px;
+}
+
+.app-canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Toolbar buttons ───────────────────────────────────────────────── */
+.tb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.tb-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.tb-btn--primary {
+  background: #1e293b;
+  border-color: #1e293b;
+  color: #ffffff;
+}
+
+.tb-btn--primary:hover {
+  background: #0f172a;
+  border-color: #0f172a;
+}
+
+.tb-divider {
+  width: 1px;
+  height: 22px;
+  background: #e2e8f0;
+  margin: 0 4px;
+}
+
+/* ─── TableNode ─────────────────────────────────────────────────────── */
+.table-node {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  min-width: 200px;
+  box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.08), 0 0 0 0 transparent;
+  overflow: hidden;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.table-node:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.12);
+}
+
+.table-node--selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px #bfdbfe;
+}
+
+.table-node__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.table-node__icon {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.table-node__title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-node__columns {
+  padding: 4px 0;
+}
+
+.table-node__col {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table-node__col:last-child {
+  border-bottom: none;
+}
+
+.table-node__col--pk {
+  background: #fffbeb;
+}
+
+.table-node__col--fk {
+  background: #eef2ff;
+}
+
+.table-node__col-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.table-node__col-badge--pk {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.table-node__col-badge--fk {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.table-node__col-badge--uq {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.table-node__col-name {
+  font-weight: 500;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-node__col-type {
+  color: #64748b;
+  font-size: 11px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.table-node__col-nullable {
+  color: #94a3b8;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+/* ─── RelationEdge ──────────────────────────────────────────────────── */
+.edge-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.edge-label__badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1.5px solid;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.edge-label__cols {
+  font-size: 10px;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+/* Badge colour variants */
+.edge-label__badge--one-to-one {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.edge-label__badge--one-to-many {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #15803d;
+}
+
+.edge-label__badge--many-to-many {
+  background: #fdf4ff;
+  border-color: #a855f7;
+  color: #7e22ce;
+}
+
+/* Edge path colour variants (SVG stroke) */
+.edge-path--one-to-one   { stroke: #3b82f6; stroke-width: 1.5; }
+.edge-path--one-to-many  { stroke: #22c55e; stroke-width: 1.5; }
+.edge-path--many-to-many { stroke: #a855f7; stroke-width: 1.5; }

@@ -1,21 +1,57 @@
-import { Handle, Position } from "reactflow";
+import { memo } from "react";
+import { Handle, Position, type NodeProps } from "reactflow";
+import type { ERDNodeData } from "../../graph/types";
 
-export default function TableNode({ data }: any) {
+function TableNode({ data, selected }: NodeProps<ERDNodeData>) {
     return (
-        <div style={{ padding: 10, border: "1px solid #333", minWidth: 180 }}>
-            <strong>{data.tableName}</strong>
+        <div className={`table-node${selected ? " table-node--selected" : ""}`}>
+            {/* Dark header */}
+            <div className="table-node__header">
+                <span className="table-node__icon">▤</span>
+                <span className="table-node__title">{data.tableName}</span>
+            </div>
 
-            <ul style={{ paddingLeft: 12 }}>
-                {data.columns.map((col: any) => (
-                    <li key={col.name} style={{ fontSize: 12 }}>
-                        {col.isPK && "🔑 "}
-                        {col.name}: {col.type}
-                    </li>
-                ))}
-            </ul>
+            {/* Column rows */}
+            <div className="table-node__columns">
+                {data.columns.map((col) => {
+                    const rowClass = col.isPK
+                        ? "table-node__col table-node__col--pk"
+                        : col.isFK
+                          ? "table-node__col table-node__col--fk"
+                          : "table-node__col";
 
+                    return (
+                        <div key={col.name} className={rowClass}>
+                            {col.isPK && (
+                                <span className="table-node__col-badge table-node__col-badge--pk">
+                                    PK
+                                </span>
+                            )}
+                            {col.isFK && !col.isPK && (
+                                <span className="table-node__col-badge table-node__col-badge--fk">
+                                    FK
+                                </span>
+                            )}
+                            {col.isUnique && !col.isPK && !col.isFK && (
+                                <span className="table-node__col-badge table-node__col-badge--uq">
+                                    UQ
+                                </span>
+                            )}
+                            <span className="table-node__col-name">{col.name}</span>
+                            <span className="table-node__col-type">{col.type}</span>
+                            {col.isNullable && (
+                                <span className="table-node__col-nullable">?</span>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Handles */}
             <Handle type="source" position={Position.Right} />
             <Handle type="target" position={Position.Left} />
         </div>
     );
 }
+
+export default memo(TableNode);

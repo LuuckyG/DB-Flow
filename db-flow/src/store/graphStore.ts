@@ -27,7 +27,7 @@ type GraphState = {
 };
 
 export const useGraphStore = create<GraphState>((set, get) => ({
-    mode: "pipeline",
+    mode: "erd",
     nodes: [],
     edges: [],
     selectedNodeId: null,
