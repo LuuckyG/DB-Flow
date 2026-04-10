@@ -5,8 +5,10 @@ import {
     applyEdgeChanges,
     type NodeChange,
     type EdgeChange,
+    type Connection,
 } from "reactflow";
-import type { AppNode, AppEdge, GraphMode, ERDNodeData } from "../graph/types";
+import { nanoid } from "nanoid";
+import type { AppNode, AppEdge, GraphMode, ERDNodeData, RelationEdgeData } from "../graph/types";
 
 type GraphState = {
     mode: GraphMode;
@@ -21,10 +23,12 @@ type GraphState = {
     setSelectedNode: (id: string | null) => void;
     updateNodeData: (nodeId: string, data: Partial<ERDNodeData>) => void;
     reorderColumn: (nodeId: string, fromIndex: number, toIndex: number) => void;
+    updateEdgeData: (edgeId: string, data: Partial<RelationEdgeData>) => void;
 
     // React Flow callbacks
     onNodesChange: (changes: NodeChange[]) => void;
     onEdgesChange: (changes: EdgeChange[]) => void;
+    onConnect: (connection: Connection) => void;
 };
 
 export const useGraphStore = create<GraphState>((set, get) => ({
@@ -78,6 +82,14 @@ export const useGraphStore = create<GraphState>((set, get) => ({
             }),
         }),
 
+    /* ---------- Update edge data (e.g. relationType) ---------- */
+    updateEdgeData: (edgeId, data) =>
+        set({
+            edges: get().edges.map((e) =>
+                e.id === edgeId ? { ...e, data: { ...e.data, ...data } } : e
+            ),
+        }),
+
     /* ---------- React Flow callbacks ---------- */
     onNodesChange: (changes: NodeChange[]) =>
         set({
@@ -88,4 +100,30 @@ export const useGraphStore = create<GraphState>((set, get) => ({
         set({
             edges: applyEdgeChanges(changes, get().edges),
         }),
+
+    /* ---------- Create a relation edge when user connects two nodes ---------- */
+    onConnect: (connection: Connection) => {
+        if (!connection.source || !connection.target) return;
+
+        // Extract column name from handle id "col-{columnName}"
+        const fromColumn =
+            connection.sourceHandle?.startsWith("col-")
+                ? connection.sourceHandle.slice(4)
+                : undefined;
+
+        const newEdge: AppEdge = {
+            id: nanoid(),
+            source: connection.source,
+            target: connection.target,
+            sourceHandle: connection.sourceHandle ?? undefined,
+            targetHandle: connection.targetHandle ?? undefined,
+            type: "relation",
+            data: {
+                relationType: "one-to-many",
+                fromColumn,
+            } satisfies RelationEdgeData,
+        };
+
+        set({ edges: [...get().edges, newEdge] });
+    },
 }));

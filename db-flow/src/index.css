@@ -128,8 +128,9 @@ body {
   border: 1.5px solid #e2e8f0;
   border-radius: 8px;
   min-width: 200px;
-  box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.08), 0 0 0 0 transparent;
-  overflow: hidden;
+  box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.08);
+  /* No overflow:hidden — would clip the per-column handles that sit on
+     the right edge of the node.                                        */
   transition: box-shadow 0.15s, border-color 0.15s;
 }
 
@@ -150,6 +151,8 @@ body {
   padding: 8px 12px;
   background: #1e293b;
   color: #f1f5f9;
+  /* Round top corners so the card looks right without overflow:hidden */
+  border-radius: 6px 6px 0 0;
 }
 
 .table-node__icon {
@@ -237,6 +240,40 @@ body {
   flex-shrink: 0;
 }
 
+/* Per-column source handle — appears as a small dot on hover */
+.table-node__col-handle.react-flow__handle {
+  width: 8px;
+  height: 8px;
+  right: -5px;
+  background: #6366f1;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s;
+  cursor: crosshair;
+}
+
+.table-node__col:hover .table-node__col-handle.react-flow__handle {
+  opacity: 1;
+}
+
+/* Target handle — always visible, left edge */
+.table-node__handle--target.react-flow__handle {
+  width: 8px;
+  height: 8px;
+  left: -5px;
+  background: #94a3b8;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.table-node:hover .table-node__handle--target.react-flow__handle,
+.table-node--selected .table-node__handle--target.react-flow__handle {
+  opacity: 1;
+}
+
 /* ─── RelationEdge ──────────────────────────────────────────────────── */
 .edge-label {
   position: absolute;
@@ -266,6 +303,22 @@ body {
   border-radius: 3px;
   border: 1px solid #e2e8f0;
   white-space: nowrap;
+}
+
+.edge-label__delete {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 3px;
+  color: #dc2626;
+  font-size: 10px;
+  padding: 1px 5px;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background 0.1s;
+}
+
+.edge-label__delete:hover {
+  background: #fecaca;
 }
 
 /* Badge colour variants */

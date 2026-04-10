@@ -5,13 +5,21 @@ import type { ERDNodeData } from "../../graph/types";
 function TableNode({ data, selected }: NodeProps<ERDNodeData>) {
     return (
         <div className={`table-node${selected ? " table-node--selected" : ""}`}>
+            {/* Single target handle — accepts incoming connections on the left */}
+            <Handle
+                type="target"
+                position={Position.Left}
+                id="table-target"
+                className="table-node__handle table-node__handle--target"
+            />
+
             {/* Dark header */}
             <div className="table-node__header">
                 <span className="table-node__icon">▤</span>
                 <span className="table-node__title">{data.tableName}</span>
             </div>
 
-            {/* Column rows */}
+            {/* Column rows — each has its own source handle on the right */}
             <div className="table-node__columns">
                 {data.columns.map((col) => {
                     const rowClass = col.isPK
@@ -42,14 +50,18 @@ function TableNode({ data, selected }: NodeProps<ERDNodeData>) {
                             {col.isNullable && (
                                 <span className="table-node__col-nullable">?</span>
                             )}
+
+                            {/* Per-column source handle — drag from here to create a relation */}
+                            <Handle
+                                type="source"
+                                position={Position.Right}
+                                id={`col-${col.name}`}
+                                className="table-node__col-handle"
+                            />
                         </div>
                     );
                 })}
             </div>
-
-            {/* Handles */}
-            <Handle type="source" position={Position.Right} />
-            <Handle type="target" position={Position.Left} />
         </div>
     );
 }

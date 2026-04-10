@@ -26,8 +26,15 @@ const edgeTypes = {
  * both Toolbar (useReactFlow) and the canvas share the same RF context.
  */
 function AppLayout() {
-    const { nodes, edges, onNodesChange, onEdgesChange, setSelectedNode, selectedNodeId } =
-        useGraphStore();
+    const {
+        nodes,
+        edges,
+        onNodesChange,
+        onEdgesChange,
+        onConnect,
+        setSelectedNode,
+        selectedNodeId,
+    } = useGraphStore();
 
     return (
         <div className="app-root">
@@ -44,6 +51,7 @@ function AppLayout() {
                     edges={edges}
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
+                    onConnect={onConnect}
                     onNodeClick={(_e, node) => setSelectedNode(node.id)}
                     onNodeDoubleClick={(_e, node) => setSelectedNode(node.id)}
                     onPaneClick={() => setSelectedNode(null)}
