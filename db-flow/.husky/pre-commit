@@ -3,4 +3,4 @@
 cd "$(git rev-parse --show-toplevel)/db-flow" || exit 1
 
 echo "🔍 Pre-commit: ESLint + TypeScript check..."
-npx lint-staged
+node node_modules/lint-staged/bin/lint-staged.js --no-stash
